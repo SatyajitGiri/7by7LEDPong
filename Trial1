@@ -1,0 +1,177 @@
+const int row[7]={0,1,2,3,4,5,6,7};    //Not sure if this works. If not replace row[1] with row1 and change code accordingly
+const int col[7]={29,30,31,32,33,34,34};
+int potent=3;
+int x, y,firstTime=1,xInc;
+
+void setup() {
+   for(i=0;i<7;i++){
+    pinMode(row[i],OUTPUT);      //For rows
+    pinMode(col[i],OUTPUT);      //For columns
+  }
+}
+
+void loop(){
+  initCond();  //Turns everything off
+  myPaddle();  //Determine my paddle location
+  comPaddle();  //Moves the computer paddle
+  ballMovX(ballPosX());    //Making the ball move in the X-direction
+  ballMovY(ballPosY()));  //Making the ball move in the Y-direction
+  glow();
+  
+}
+
+void glow(){
+  initCond();
+  myPaddle();
+  comPaddle();
+  digitalWrite(row[y],HIGH);
+  digitalWrite(col[x],LOW);
+  delay(200);
+  myPaddle();
+  comPaddle();
+  delay(200);
+  if(firstTime==1)
+    firstTime=0;
+}
+void initCond(void){
+  //Reset the connections such that all LEDs are turned off
+  int i;
+  for(i=0;i<7;i++)
+    digitalWrite(row[i],LOW);    //All rows->LOW
+  for(i=29;i<36;i++)
+    digitalWrite(col[i],HIGH);    //All columns -> HIGH
+}
+
+void myPaddle(){
+  //Determine the orientation of the potentiometer and makes three LEDs glow in the bottom row of the LED matrix
+  digitalWrite(row[7],HIGH);
+  for(i=analogRead(potent)/1023*5,count=0;count<3;count++){
+    digitalWrite(col[i+count],LOW);
+  }
+}
+
+void comPaddle(){
+  static int i;
+  digitalWrite(row[1],HIGH);
+  if(firstTime){
+    i=3;
+    }
+  
+  else{
+    if(x<i+1){
+      if(i=1)
+        break;
+      if(i=2|(|i+1)-x=1)
+        i-=1;
+      if(i>2)
+        i-=2;
+      }
+    if(x>i+1){
+      if(i=7)
+        break;
+      if(i=6||x-(i+1)=1)
+        i+=1;
+      if(i<6)
+        i+=2;
+      }
+    }
+      
+  for(count=0;count<3;count++){
+      digitalWrite(col[i+count],LOW);
+  }
+}
+  
+  
+int ballPosX(){
+  //Returns the x-position of the ball -> corresponding to column 
+  
+  if(firstTime){
+    x=4;
+  }
+    
+  return x;
+}
+
+int ballPosY(){
+  //Returns the x-position of the ball -> corresponding to column && Determines if the Game Ends or not
+  if(firstTime){
+    y=4;
+  }
+   
+  if((y==1)||y==7){
+    death();
+  }
+  return y;
+}
+
+void ballMovX(int xPos, int yPos){
+  //x-direction reverses if the ball hits the wall, randomly changes (within the range of initial unit direction of ball*[0,3]) if it hits the paddle
+  
+  if(firstTime){
+    xInc=1    
+   }
+   
+  if((xPos==7)||(xPos==1){
+     xInc=(-1)*xInc;  
+   }
+   
+  if((yPos==2)||(yPos==6)){
+     if(xInc<0)
+       xInc=(-1)*(millis()%3);
+     else
+       xInc=(millis()%3);
+   }   
+   
+   x+=xInc;
+}
+
+void ballMovX(int yPos){
+  //if ball hits the paddle->y-direction of the ball reverses
+  static int yInc;
+  
+  if(firstTime){
+    yInc=1    
+   }
+   
+   if((yPos==2)||(yPos==6)){  
+          yInc=(-1)*yInc;
+   }
+   y+=yInc;
+}
+   
+void death(){
+  initCond();
+  int i;
+  //Make all LEDs flash 3 times(just fun)
+  
+  //First time
+  for(i=0;i<7;i++){
+    digitalWrite(row[i],HIGH);
+    digitalWrite(col[i],LOW);
+  }
+  delay(500);
+  initCond();
+  delay(500);
+  
+  //Second time
+  for(i=0;i<7;i++){
+    digitalWrite(row[i],HIGH);
+    digitalWrite(col[i],LOW);
+  }
+  delay(500);
+  initCond();
+  delay(500);  
+  
+  //Third time
+  for(i=0;i<7;i++){
+    digitalWrite(row[i],HIGH);
+    digitalWrite(col[i],LOW);
+  }
+  delay(500);
+  initCond();
+  delay(500);
+  
+  //Reset to the begenning
+  firstTime=1;
+  delay(3000);
+}
